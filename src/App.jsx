@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Package, Wrench, Brain, Book, History, Keyboard, Sun, Moon } from 'lucide-react';
+import { Package, Wrench, Brain, Book, History, Keyboard, Sun, Moon, Monitor, Users } from 'lucide-react';
+import { playClick } from './utils/audio';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
@@ -7,6 +8,8 @@ const DeckBuilderPage = lazy(() => import('./pages/DeckBuilderPage'));
 const AdvisorPage = lazy(() => import('./pages/AdvisorPage'));
 const EncyclopediaPage = lazy(() => import('./pages/EncyclopediaPage'));
 const HistoryPage = lazy(() => import('./pages/HistoryPage'));
+const ScoreboardPage = lazy(() => import('./pages/ScoreboardPage'));
+const CommunityHubPage = lazy(() => import('./pages/CommunityHubPage'));
 
 const PAGES = [
   { id: 'inventory', icon: Package, label: '武器庫', key: '1' },
@@ -14,6 +17,8 @@ const PAGES = [
   { id: 'advisor', icon: Brain, label: '建議', key: '3' },
   { id: 'encyclopedia', icon: Book, label: '圖鑑', key: '4' },
   { id: 'history', icon: History, label: '紀錄', key: '5' },
+  { id: 'community', icon: Users, label: '大廳', key: '6' },
+  { id: 'scoreboard', icon: Monitor, label: '計分', key: '7' },
 ];
 
 function LoadingFallback() {
@@ -67,6 +72,8 @@ export default function App() {
       case 'advisor': return <AdvisorPage />;
       case 'encyclopedia': return <EncyclopediaPage />;
       case 'history': return <HistoryPage />;
+      case 'community': return <CommunityHubPage />;
+      case 'scoreboard': return <ScoreboardPage />;
       default: return <InventoryPage />;
     }
   };
@@ -78,7 +85,7 @@ export default function App() {
           <div className="sidebar-logo" onClick={toggleTheme} title="切換主題">🌀</div>
           {PAGES.map(p => (
             <button key={p.id} className={`sidebar-btn ${page === p.id ? 'active' : ''}`}
-              onClick={() => setPage(p.id)} title={`${p.label} (${p.key})`}>
+              onClick={() => { playClick(); setPage(p.id); }} title={`${p.label} (${p.key})`}>
               <p.icon size={22} />
             </button>
           ))}
@@ -100,7 +107,7 @@ export default function App() {
         <nav className="bottom-nav">
           {PAGES.map(p => (
             <button key={p.id} className={`bottom-nav-btn ${page === p.id ? 'active' : ''}`}
-              onClick={() => setPage(p.id)}>
+              onClick={() => { playClick(); setPage(p.id); }}>
               <p.icon size={18} />
               <span>{p.label}</span>
             </button>

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Search, ExternalLink } from 'lucide-react';
+import { Search, ExternalLink, Heart } from 'lucide-react';
+import useInventoryStore from '../store/useInventoryStore';
 import { getAllParts, TIER_COLORS, TYPE_ICONS, DB_LAST_UPDATED } from '../data/partsDatabase';
 import { getPartImage } from '../data/partImages';
 import { useDebounce } from '../hooks/useDebounce';
@@ -12,6 +13,7 @@ const FILTER_TYPES = [
   { id: 'lockChip', label: '🔷 鎖定晶片' },
   { id: 'mainBlade', label: '🗡️ 主刃' },
   { id: 'assistBlade', label: '🛡️ 輔助刃' },
+  { id: 'favorite', label: '❤️ 願望清單' },
 ];
 const TIER_FILTERS = ['全部', 'T0', 'T0.5', 'T1', 'T2', 'T3'];
 
@@ -37,6 +39,7 @@ function PartImage({ part, size = 64 }) {
 }
 
 export default function EncyclopediaPage() {
+  const { isFavorite, toggleFavorite, favorites } = useInventoryStore();
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterTier, setFilterTier] = useState('全部');
@@ -45,7 +48,7 @@ export default function EncyclopediaPage() {
   const debouncedSearch = useDebounce(search, 150);
 
   const filtered = allParts
-    .filter(p => filterType === 'all' || p.partType === filterType)
+    .filter(p => filterType === 'all' || (filterType === 'favorite' ? favorites.includes(p.id) : p.partType === filterType))
     .filter(p => filterTier === '全部' || p.tier === filterTier)
     .filter(p => !debouncedSearch || [p.name, p.nameJP, p.nameCN, p.code, p.abbr]
       .some(v => v && v.toLowerCase().includes(debouncedSearch.toLowerCase())));
@@ -83,7 +86,10 @@ export default function EncyclopediaPage() {
           <div className="part-card" key={p.id} onClick={() => setSelected(p)} style={{ cursor: 'pointer' }}>
             <PartImage part={p} size={48} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="part-name">{p.name}</div>
+              <div className="part-name">
+                {p.name}
+                {isFavorite(p.id) && <Heart size={14} fill="var(--accent-gold)" color="var(--accent-gold)" style={{ marginLeft: 6, display: 'inline-block' }} />}
+              </div>
               <div className="part-sub">
                 {p.nameCN || p.nameJP || ''} {p.code ? `• ${p.code}` : ''} {p.abbr ? `(${p.abbr})` : ''}
               </div>
@@ -105,10 +111,15 @@ export default function EncyclopediaPage() {
               <div>
                 <h2 style={{ margin: 0, marginBottom: 4 }}>{selected.name}</h2>
                 <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 6 }}>{selected.nameCN || selected.nameJP || ''}</div>
-                <span className="tier-badge" style={{
-                  background: `${TIER_COLORS[selected.tier]}22`, color: TIER_COLORS[selected.tier],
-                  border: `1px solid ${TIER_COLORS[selected.tier]}44`, fontSize: 14, padding: '4px 14px',
-                }}>{selected.tier}</span>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span className="tier-badge" style={{
+                    background: `${TIER_COLORS[selected.tier]}22`, color: TIER_COLORS[selected.tier],
+                    border: `1px solid ${TIER_COLORS[selected.tier]}44`, fontSize: 14, padding: '4px 14px',
+                  }}>{selected.tier}</span>
+                  <button className="btn btn-ghost" onClick={() => toggleFavorite(selected.id)} style={{ padding: '6px' }}>
+                    <Heart size={20} fill={isFavorite(selected.id) ? 'var(--accent-gold)' : 'none'} color={isFavorite(selected.id) ? 'var(--accent-gold)' : 'var(--text-secondary)'} />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -127,6 +138,8 @@ export default function EncyclopediaPage() {
               <Detail label="旋轉方向" value={selected.spin || '—'} />
               <Detail label="競技等級" value={selected.tier} color={TIER_COLORS[selected.tier]} />
               {selected.abbr && <Detail label="縮寫代碼" value={selected.abbr} />}
+              {selected.weight && <Detail label="實測重量" value={`${selected.weight}g`} />}
+              {selected.cg && <Detail label="重心分佈" value={selected.cg} />}
               {selected.height != null && <Detail label="軸心高度" value={`${selected.height}mm`} />}
               {selected.protrusions != null && <Detail label="棘輪齒數" value={selected.protrusions} />}
             </div>
