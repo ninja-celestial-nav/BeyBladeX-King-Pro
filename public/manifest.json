@@ -1,0 +1,14 @@
+{
+  "name": "Beyblade X King",
+  "short_name": "BX King",
+  "description": "Beyblade X 競技級牌組構築與戰力分析工具",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
