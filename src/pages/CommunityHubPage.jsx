@@ -57,8 +57,21 @@ export default function CommunityHubPage() {
 
   const importDeck = (deckObj) => {
     playClick();
+    
+    // 提取所有零件 ID
+    const partsToInventory = [];
+    Object.values(deckObj).forEach(s => {
+      if (s.blade) partsToInventory.push(s.blade);
+      if (s.ratchet) partsToInventory.push(s.ratchet);
+      if (s.bit) partsToInventory.push(s.bit);
+    });
+    
+    // 自動加入武器庫，確保在構築頁面能顯示
+    useInventoryStore.getState().bulkAddParts(partsToInventory);
+    
+    // 設定當前牌組
     useInventoryStore.setState({ currentDeck: deckObj });
-    alert('已成功匯入至你的牌組構築區！請前往牌組頁面查看。');
+    alert('已成功匯入牌組！系統已自動將對應零件加入您的武器庫。');
   };
 
   return (
