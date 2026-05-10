@@ -3,6 +3,7 @@ import { Minus, Plus, Monitor, XCircle, RotateCcw } from 'lucide-react';
 import useInventoryStore from '../store/useInventoryStore';
 import { getPartById } from '../data/partsDatabase';
 import { getPartImage } from '../data/partImages';
+import { playClick } from '../utils/audio';
 
 export default function ScoreboardPage() {
   const { currentDeck } = useInventoryStore();
@@ -17,8 +18,9 @@ export default function ScoreboardPage() {
   }, [currentDeck]);
 
   const addScore = (player, pts) => {
-    if (player === 1) setScoreP1(Math.min(scoreP1 + pts, 7)); // Play to 4 or 7 points usually
-    if (player === 2) setScoreP2(Math.min(scoreP2 + pts, 7));
+    playClick();
+    if (player === 1) setScoreP1(s => Math.min(s + pts, 7));
+    if (player === 2) setScoreP2(s => Math.min(s + pts, 7));
   };
   
   const reset = () => {

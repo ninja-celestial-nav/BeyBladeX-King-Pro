@@ -56,8 +56,8 @@ export default function DeckBuilderPage() {
     }
   };
 
-  const deckCode = btoa(JSON.stringify(currentDeck));
-  const shareUrl = `${window.location.origin}/community?deck=${deckCode}`;
+  const deckCode = btoa(unescape(encodeURIComponent(JSON.stringify(currentDeck))));
+  const shareUrl = `${window.location.origin}/#community?deck=${deckCode}`;
 
   return (
     <div>

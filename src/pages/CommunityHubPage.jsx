@@ -36,7 +36,7 @@ export default function CommunityHubPage() {
     const deckCode = params.get('deck');
     if (deckCode) {
       try {
-        const decoded = JSON.parse(atob(deckCode));
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(deckCode))));
         if (decoded.slot1 && decoded.slot2 && decoded.slot3) {
           setSharedDeck(decoded);
         }
@@ -48,8 +48,8 @@ export default function CommunityHubPage() {
 
   const copyLink = (deckObj) => {
     playClick();
-    const code = btoa(JSON.stringify(deckObj));
-    const url = `${window.location.origin}/?deck=${code}#community`;
+    const code = btoa(unescape(encodeURIComponent(JSON.stringify(deckObj))));
+    const url = `${window.location.origin}/#community?deck=${code}`;
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
